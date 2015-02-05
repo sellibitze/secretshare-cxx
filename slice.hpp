@@ -4,12 +4,26 @@
 #include <cassert>
 #include <cstddef>
 #include <stdexcept>
+#include <type_traits>
+
+#define REQUIRES_VALID_ARRAY_PTR_CONVERSION(X, Y) \
+	,class = typename std::enable_if< \
+		std::is_convertible<X*, Y*>::value && \
+		(sizeof(X) == sizeof(Y)) \
+	>::type
 
 template<class T>
 class slice
 {
 public:
-	explicit slice(T* base, std::size_t len) : base(base), len(len) {}
+	template<class U REQUIRES_VALID_ARRAY_PTR_CONVERSION(U, T)>
+	explicit slice(U* base, std::size_t len) : base(base), len(len) {}
+
+	template<class U, std::size_t N REQUIRES_VALID_ARRAY_PTR_CONVERSION(U, T)>
+	slice(U (&arr)[N]) : base(arr), len(N) {}
+
+	template<class U REQUIRES_VALID_ARRAY_PTR_CONVERSION(U, T)>
+	slice(slice<U> x) : base(x.base), len(x.len) {}
 
 	std::size_t size() const { return len; }
 	bool empty() const { return len==0; }
@@ -43,6 +57,8 @@ private:
 	T* base;
 	std::size_t len;
 };
+
+#undef REQUIRES_VALID_ARRAY_PTR_CONVERSION
 
 #endif /* include guard */
 

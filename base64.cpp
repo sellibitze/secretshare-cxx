@@ -1,5 +1,6 @@
 #include <cassert>
 #include <stdexcept>
+#include "base64.hpp"
 
 namespace {
 
@@ -71,4 +72,35 @@ triple quad::decode() const
 }
 
 } // namespace
+
+std::string base64_enc(slice<const unsigned char> data)
+{
+	std::string temp;
+	temp.reserve((data.size()*4+2)/3);
+	while (data) {
+		auto chunk = data.size()>3 ? 3 : data.size();
+		triple t = {{0}};
+		for (unsigned k=0; k<chunk; ++k) t.octets[k] = data.shift();
+		quad q = t.encode();
+		chunk += 1; // n bytes => n+1 characters (for 1<=n<=3)
+		for (unsigned k=0; k<chunk; ++k) temp += q.ascii[k];
+	}
+	return temp;
+}
+
+std::vector<unsigned char> base64_dec(std::string const& text)
+{
+	std::vector<unsigned char> temp;
+	temp.reserve(text.size()*3/4);
+	for (std::size_t pos=0; pos+2<=text.size(); pos+=4) {
+		quad q = {{'A', 'A', 'A', 'A'}};
+		auto remain = text.size() - pos;
+		auto csize = remain>4 ? 4 : remain;
+		for (unsigned k=0; k<csize; ++k) q.ascii[k] = text[pos+k];
+		triple t = q.decode();
+		csize -= 1; // n+1 characters => n bytes (for 1<=n<=3)
+		for (unsigned k=0; k<csize; ++k) temp.push_back(t.octets[k]);
+	}
+	return temp;
+}
 
