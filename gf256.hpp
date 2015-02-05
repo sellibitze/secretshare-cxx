@@ -18,6 +18,9 @@ public:
 	friend gf256& operator+=(gf256& a, gf256 b) { a.v ^= b.v; return a; }
 	friend gf256& operator-=(gf256& a, gf256 b) { a.v ^= b.v; return a; }
 
+	friend bool operator==(gf256 a, gf256 b) { return a.v == b.v; }
+	friend bool operator!=(gf256 a, gf256 b) { return a.v != b.v; }
+
 private:
 	unsigned char v;
 };

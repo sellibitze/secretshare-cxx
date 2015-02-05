@@ -12,7 +12,7 @@ public:
 	void process_block(slice<const unsigned char> data);
 	void process_byte(unsigned char bite);
 
-	std::uint32_t to_uint() const { return state; }
+	std::uint32_t finish() const;
 
 private:
 	std::uint32_t state;

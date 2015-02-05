@@ -54,3 +54,8 @@ void crc24hasher::process_block(slice<const unsigned char> data)
 	this->state = temp & 0xFFFFFF;
 }
 
+std::uint32_t crc24hasher::finish() const
+{
+	return state;
+}
+
