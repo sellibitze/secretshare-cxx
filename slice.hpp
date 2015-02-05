@@ -23,7 +23,7 @@ public:
 		return base[index];
 	}
 
-	&T shift()
+	T& shift()
 	{
 		if (empty()) throw std::logic_error("slice already empty");
 		auto old = base;

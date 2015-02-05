@@ -1,3 +1,5 @@
+#include "poly.hpp"
+
 gf256 poly_evaluate(slice<const gf256> polycoeffs, gf256 xcoord)
 {
 	auto acc = gf256::zero();

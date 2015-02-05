@@ -16,7 +16,6 @@ struct tables
 {
 	unsigned char log[256];
 	unsigned char exp[256];
-
 	tables();
 };
 
