@@ -39,8 +39,6 @@ tables const& get_tables()
 
 } // namespace
 
-namespace gf {
-
 gf256 gf256::exp(unsigned p)
 {
 	return gf256(get_tables().exp[p % 255]);
@@ -76,6 +74,4 @@ gf256 operator/(gf256 a, gf256 b)
 		return gf256(t.exp[(t.log[raw_a] + 255 - t.log[raw_b]) % 255]);
 	}
 }
-
-} // namespace gf
 
