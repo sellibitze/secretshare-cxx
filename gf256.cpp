@@ -45,7 +45,9 @@ gf256 gf256::exp(unsigned p)
 
 unsigned log(gf256 x)
 {
-	return get_tables().log[x.to_byte()];
+	auto bite = x.to_byte();
+	if (bite == 0) throw std::domain_error("Logarithm of zero");
+	return get_tables().log[bite];
 }
 
 gf256 operator*(gf256 a, gf256 b)
@@ -73,4 +75,3 @@ gf256 operator/(gf256 a, gf256 b)
 		return gf256(t.exp[(t.log[raw_a] + 255 - t.log[raw_b]) % 255]);
 	}
 }
-

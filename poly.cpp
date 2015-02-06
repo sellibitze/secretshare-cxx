@@ -1,21 +1,24 @@
+#include "gf256.hpp"
 #include "poly.hpp"
 
-gf256 poly_evaluate(slice<const gf256> polycoeffs, gf256 xcoord)
+octet poly_evaluate(slice<const octet> polycoeffs, octet xcoord)
 {
+	auto const x = gf256(xcoord);
 	auto acc = gf256::zero();
 	auto fac = gf256::one();
 	while (polycoeffs) {
-		auto c = polycoeffs.shift();
+		auto c = gf256(polycoeffs.shift());
 		acc += c * fac;
-		fac *= xcoord;
+		fac *= x;
 	}
-	return acc;
+	return acc.to_byte();
 }
 
-gf256 poly_interpolate(slice<const gf256_point> points, gf256 xcoord)
+octet poly_interpolate(slice<const point> points, octet xcoord)
 {
 	// Lagrange interpolation
 	const unsigned ord = points.size();
+	const auto x = gf256(xcoord);
 	auto acc = gf256::zero();
 	for (unsigned i=0; i<ord; ++i) {
 		auto prod = gf256::one();
@@ -23,11 +26,11 @@ gf256 poly_interpolate(slice<const gf256_point> points, gf256 xcoord)
 		for (unsigned j=0; j<ord; ++j) {
 			if (i != j) {
 				auto& pj = points[j];
-				prod *= (xcoord - pj.x) / (pi.x - pj.x);
+				prod *= (x - gf256(pj.x)) / (gf256(pi.x) - gf256(pj.x));
 			}
 		}
-		acc += prod * pi.y;
+		acc += prod * gf256(pi.y);
 	}
-	return acc;
+	return acc.to_byte();
 }
 

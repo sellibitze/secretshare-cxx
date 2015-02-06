@@ -1,18 +1,19 @@
 #ifndef INC_GUARD_EM7ZIEVDIW81E883BCTXW4Z2K42QIE
 #define INC_GUARD_EM7ZIEVDIW81E883BCTXW4Z2K42QIE
 
-#include "gf256.hpp"
 #include "slice.hpp"
 
-struct gf256_point
+typedef unsigned char octet;
+
+struct point
 {
-	gf256 x, y;
-	explicit gf256_point(gf256 x, gf256 y) : x(x), y(y) {}
+	octet x, y;
+	explicit point(octet x, octet y) : x(x), y(y) {}
 };
 
-gf256 poly_evaluate(slice<const gf256> polycoeffs, gf256 xcoord);
+octet poly_evaluate(slice<const octet> polycoeffs, octet xcoord);
 
-gf256 poly_interpolate(slice<const gf256_point> points, gf256 xcoord);
+octet poly_interpolate(slice<const point> points, octet xcoord);
 
 #endif /* include guard */
 
