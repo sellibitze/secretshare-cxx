@@ -36,6 +36,8 @@ inline std::uint32_t process_byte_impl(std::uint32_t state,
 
 } // namespace
 
+crc24hasher::crc24hasher() : state(INIT_VALUE) {}
+
 void crc24hasher::process_byte(unsigned char bite)
 {
 	auto& tab = get_table();
