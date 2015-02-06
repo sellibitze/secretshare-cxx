@@ -9,6 +9,7 @@ struct point
 {
 	octet x, y;
 	explicit point(octet x, octet y) : x(x), y(y) {}
+	point() : x(0), y(0) {}
 };
 
 octet poly_evaluate(slice<const octet> polycoeffs, octet xcoord);
