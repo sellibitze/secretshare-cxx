@@ -7,7 +7,7 @@ tests: test_base64 test_gf256
 
 TEST_GF256_OBJ = gf256.o test_gf256.o
 TEST_BASE64_OBJ = base64.o test_base64.o
-SSS_OBJ = base64.o crc24.o gf256.o poly.o getrandom.o main.o
+SSS_OBJ = base64.o crc24.o gf256.o poly.o getrandom.o io.o main.o
 
 test_base64: $(TEST_BASE64_OBJ)
 	$(CXX) -o $@ $(TEST_BASE64_OBJ) $(LDFLAGS)
