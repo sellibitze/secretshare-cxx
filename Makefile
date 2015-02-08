@@ -1,7 +1,7 @@
 CXXFLAGS = -std=c++11 -Wall -O1 -MMD
 LDFLAGS = 
 
-all: tests sss
+all: sss
 
 tests: test_base64 test_gf256
 
