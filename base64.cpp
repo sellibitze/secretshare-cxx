@@ -22,7 +22,7 @@ inline std::uint32_t char_to_num(char c)
 {
 	if ('A' <= c && c <= 'Z') return c - 'A';
 	if ('a' <= c && c <= 'z') return (c - 'a') + 26;
-	if ('0' <= c && c <= '9') return (c - 'a') + 54;
+	if ('0' <= c && c <= '9') return (c - '0') + 52;
 	if (c == '+') return 62;
 	if (c == '/') return 63;
 	throw std::domain_error("Illegal Base64 character found");
@@ -35,7 +35,7 @@ inline char num_to_char(std::uint32_t num)
 		return char('a' + (num - 26));
 	} else {
 		if (num < 62) return char('0' + (num - 52));
-		if (num < 64) return "+-"[num - 62];
+		if (num < 64) return "+/"[num - 62];
 		assert(!"Illegal Base64 character index");
 		throw std::domain_error("Illegal Base64 character index");
 	}
