@@ -1,6 +1,129 @@
-# What's this?
+# secretshare
 
-It's _work in progress_ is what it is. No functionality yet.
+This program is an implementation of
+[Shamir's secret sharing](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing).
+A secret can be split into N shares in a way so that
+a selectable number of shares K (with K ≤ N) is required
+to reconstruct the secret again.
 
-You might want to checkout [Wikipedia](https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing)
-or this [Rust implementation](https://github.com/sellibitze/secretshare) instead.
+**Warning**: I don't yet recommend the serious use of this tool. The
+encoding of the shares might change in a newer version in which case
+you would have trouble decoding secrets that have been shared using
+an older version of the program. For now, this is experimental.
+
+# Example
+
+Passing a secret to secretshare for encoding:
+
+```
+$ echo My secret | ./sss e 2 5
+2-1-1YAYwmOHqZ69jA-v+mz
+2-2-YJZQDGm22Y77Gw-IhSh
+2-3-+G9ovW9SAnUynQ-Elwi
+2-4-F7rAjX3UOa53KA-b2vm
+2-5-j0P4PHsw4lW+rg-XyNl
+```
+
+The parameters following the `e` command tell `secretshare` to create 5 shares of which 2 will be necessary for decoding.
+
+Decoding a subset of shares (one share per line) can be done like this:
+
+```
+$ echo -e 2-2-YJZQDGm22Y77Gw-IhSh 2-4-F7rAjX3UOa53KA-b2vm | ./sss d
+My secret
+```
+
+# Portability
+
+Right now, `secretshare` only works in *nix environments because there is no `/dev/urandom` on Windows and I don't have a Windows box available at the moment. Another issue is binary I/O on stdin/stdout. The stream objects `cin` and `cout` are opened in text. This makes a huge difference on Windows. If you want to help out and can test the program on Windows, feel free to have a look at the `os_specific` directory and send a pull-request. :)
+
+# Building
+
+You should be able to build it by invoking `make` like this
+
+```
+$ make -j
+```
+
+# I/O
+
+The secret data does not have to be text. `secretshare` treats it as
+binary data. But, of course, you can feed it text as well. In the above
+example the echo command terminated the string with a line feed which
+is actually part of the secret and output as well after decoding.
+Note that, while `secretshare` supports secrets of up to 64 KiB
+it makes little sense to use such large secrets directly. In situations
+where you want to share larger secrets, you would usually pick a random
+password for encryption and use that password as secret for `secretshare`.
+
+The generated shares are lines of ASCII text.
+
+# Structure of the shares
+
+```
+  2-1-LiTyeXwEP71IUA-Qj6n
+  ^ ^ ^^^^^^^^^^^^^^ ^^^^
+  K N        D        C
+```
+
+A share is built out of three or four parts separated with a minus: K-N-D-C.
+The last part is optional. K is one of the encoding parameters that tell you
+how many distinct
+shares of a specific secret are necessary to be able to recover the
+secret. The number N identifies the share (ranging from 1 to the number
+of shares that have been created). The D part is a Base64 encoding of
+a specific share's raw data. The optional part C is a Base64 encoding
+of a CRC-24 checksum of the concatenation of K and N as bytes followed
+by the share's raw data (before Base64 encoding). The same checksum
+algorithm is used in the OpenPGP format for “ASCII amoring”.
+
+# A word on the secrecy
+
+Shamir's secret sharing is known to have the perfect secrecy property.
+In the context of (K,N)-threshold schemes this means that if you have
+less than K shares available, you have absolutely no information about
+what the secret is except for its length. The checksums that are included
+in the shares
+also don't reveal anything about the secret.
+They are just a simple integrity protection of the shares themselves.
+In other words, given a share without checksum, we can derive a share
+with a checksum. This obviously does not add any new information.
+
+# Galois field
+
+Shamir's secret sharing algorithm requires the use of polynomials over
+a finite field. One easy way of constructing a finite field is to pick
+a prime number p, use the integers 0, 1, 2, ..., p-1 as field elements
+and simply use modular arithmetic (mod p) for the field operations.
+
+So, you *could* pick a prime like 257 to apply Shamir's algorithm
+byte-wise. The downside of this is that the shares would consist of
+sequences of values each between 0 and 256 *inclusive*. So, you would
+need more than 8 bits to encode each of them.
+
+Luckily, there is another way. We are not restricted to so-called
+prime fields. There are also non-prime fields where the number of
+elements is a *power* of a prime, for example 2^8=256. It's just
+a bit harder to explain how they are constructed. The finite
+field I used is the same as the one you can find in the RAID 6
+implementation of the Linux kernel or the Anubis block cipher:
+Gf(2^8) reduction polynomial is x^8 + x^4 + x^3 + x^2 + 1 or
+alternatively 11D in hex.
+
+# How does it compare to `ssss`?
+
+There is already a [tool](http://point-at-infinity.org/ssss/) that
+implements Shamir's secret sharing scheme. But it is incompatible
+with this project. There are certain differences:
+
+* `ssss` uses big integers via `libgmp` to do its finite field calculations
+  whereas `secretshare` always uses a fixed finite field of 256 elements
+  and simply applies the algorithm byte-wise regardless of the length
+  of the secret.
+* The shares of `ssss` don't include the encoding parameter K. So, if you
+  want to use `ssss` instead you would have to remember yourself how many
+  shares are necessary to decode the secret again.
+* `ssss` uses a hex encoding of the shares whereas `secretshare` crams
+  more bits into the characters via Base64.
+* `ssss` does not add any checksums to the shares.
+
