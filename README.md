@@ -26,10 +26,10 @@ $ echo My secret | ./sss e 2 5
 
 The parameters following the `e` command tell `secretshare` to create 5 shares of which 2 will be necessary for decoding.
 
-Decoding a subset of shares (one share per line) can be done like this:
+Decoding a subset of shares can be done like this:
 
 ```
-$ echo -e 2-2-YJZQDGm22Y77Gw-IhSh 2-4-F7rAjX3UOa53KA-b2vm | ./sss d
+$ echo 2-2-YJZQDGm22Y77Gw-IhSh 2-4-F7rAjX3UOa53KA-b2vm | ./sss d
 My secret
 ```
 
