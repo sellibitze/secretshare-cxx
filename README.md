@@ -35,7 +35,7 @@ My secret
 
 # Portability
 
-Right now, `secretshare` only works in *nix environments because there is no `/dev/urandom` on Windows and I don't have a Windows box available at the moment. Another issue is binary I/O on stdin/stdout. The stream objects `cin` and `cout` are opened in text. This makes a huge difference on Windows. If you want to help out and can test the program on Windows, feel free to have a look at the `os_specific` directory and send a pull-request. :)
+Right now, `secretshare` only works in *nix environments because there is no `/dev/urandom` on Windows and I don't have a Windows box available at the moment. Another issue is binary I/O on stdin/stdout. The stream objects `cin` and `cout` are opened in text mode. This makes a huge difference on Windows. If you want to help out and can test the program on Windows, feel free to have a look at the `os_specific` directory and send a pull-request. :)
 
 # Building
 
